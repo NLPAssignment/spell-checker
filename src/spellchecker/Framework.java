@@ -92,7 +92,7 @@ public class Framework {
 		String correct;  
 		int distance=0;
 	    System.out.println("Calculating distances of wrong word from all possible words...");
-		int min = Integer.MAX_VALUE;	// Maximum possible value, instead of "9999" - Sagar
+		int min = Integer.MAX_VALUE;
 		Set<String> candidates = new HashSet<String>();
 		
 	    for (int i = 0 ; i < correctWords.size() ; i++)
