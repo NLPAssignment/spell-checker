@@ -21,11 +21,15 @@ import java.util.Set;
 
 public class Framework {
 
-	ArrayList<String> correctWords = new ArrayList<String>() ;	// Why not HashSet here too? - Sagar
+	ArrayList<String> correctWords = new ArrayList<String>();	// Why not HashSet here too? - Sagar
+	ArrayList<String> wrongWords = new ArrayList<String>();
 	
 	Bigrams bigrams = new Bigrams();
 	
 	ErrorMatrices errorMatrices = new ErrorMatrices();
+	
+	static final int EDIT_DISTANCE = 0;
+	static final int CONFUSION_MATRIX = 1;
 	
 	public void readFile() throws FileNotFoundException,IOException
 	{
@@ -42,26 +46,29 @@ public class Framework {
 			//parts[0] has wrong word
 			//parts[1] has correct word
 			
-			// 1) for knowledge based static approach
-			//the following code stores all correct words in a list(no repetitions)
-			String words[] = parts[1].split("[,|'| |-]"); //not the right solution-patch for time being -Lekha
+			/*
+				1) for knowledge based static approach
+				the following code stores all correct words in a list(no repetitions)
+			*/
 			
-			for(int i = 0; i< words.length ; i++)
+			String currentCorrectWord = parts[1].toLowerCase(); //for things like America
+			String currentWrongWord = parts[0].toLowerCase(); //for things like America
+			
+			// Using isValid() function from spellchecker.Utilities class to get rid of corner cases
+			if (Utilities.isValid(currentCorrectWord) && !correctWords.contains(currentCorrectWord))
 			{
-				String currentWord = words[i].toLowerCase(); //for things like America
-				if (!currentWord.isEmpty() && !correctWords.contains(currentWord) && currentWord.matches("[a-z]*"))
-				{
-					correctWords.add(currentWord);
-					//System.out.println("-"+currentWord+"-");
-					bigrams.update(currentWord); //updates bigram counts					
-				}
+				correctWords.add(currentCorrectWord);
+				wrongWords.add(currentWrongWord);
+				bigrams.update(currentCorrectWord); //updates bigram counts					
 			}
 			
-			// 2) For generative technique using Jurafsky formulation 
-			//update counts for S,I,D,X matrices
+			/*
+				2) For generative technique using Jurafsky formulation 
+				update counts for S,I,D,X matrices
+			*/
 			
-			if(parts[0].matches("[a-z]*") && parts[1].matches("[a-z]*"))
-				errorMatrices.updateMatrices(parts[0],parts[1]);
+			if(Utilities.isValid(parts[0]) && Utilities.isValid(parts[1]))
+				errorMatrices.updateMatrices(parts[0], parts[1]);
 			
 		}
 		
@@ -79,9 +86,8 @@ public class Framework {
 		System.out.println("\n--CORRECT DICTIONARY WORDS--\n");
 		for (int i = 0; i< correctWords.size() ; i++)
 		{
-			System.out.println(i+" : " + correctWords.get(i));
+			//System.out.println(i+": " + correctWords.get(i));	Temporarily commented out - Sagar
 		}
-		
 	}
 	
 	/*
@@ -89,7 +95,7 @@ public class Framework {
 	 * it computes edit distances from all possible correct words and finds candidates with min edit distance
 	 * ties are broken using bigram probabilities
 	 * */
-	public void spellCheckEditDistance(String wrong)
+	public String spellCheckEditDistance(String wrong)
 	{
 		String correct;  
 		int distance=0;
@@ -138,7 +144,9 @@ public class Framework {
 	    	}
 	    }
 	    System.out.println("-----------------");
-	    System.out.println("Best Word: "+best);
+	    System.out.println("Best Word: " + best);
+		
+		return best;
 	}
 	
 	//given two strings calculate edit distance between them using dynamic programming
@@ -164,9 +172,7 @@ public class Framework {
         	}
         }
         return(d[m][n]);
-	
 	}
-	  	
 	
 	public void spellCheckConfusionMatrices(String wrong)
 	{
@@ -255,10 +261,43 @@ public class Framework {
 	    {
 	    	String candidateWord = iterator.next();
 	    	System.out.println(candidateWord);
-	    	
 	    }
 	    System.out.println("------------------");
 	   		
+	}
+	
+	/*
+		Checks accuracy of a method on the test sets in correctWords and wrongWords and returns it
+		Working for methid = EDIT_DISTANCE, but not for CONFUSION_MATRIX
+	*/
+	public double checkAccuracy(int method)
+	{
+		if(method == Framework.CONFUSION_MATRIX)
+		{
+			System.out.println("Under construction");
+			return -1.0;
+		}
+	
+		int correctCount = 0;
+		int wrongCount = 0;
+		String predictedCorrect = "";
+		
+		for(int i=0; i<correctWords.size(); i++)
+		{
+			String actualCorrect = correctWords.get(i);
+			String wrong = wrongWords.get(i);
+			
+			if(method == Framework.EDIT_DISTANCE)
+				predictedCorrect = spellCheckEditDistance(wrong);
+			
+			if(predictedCorrect.equals(actualCorrect))
+				correctCount++;
+			else
+				wrongCount++;
+		}
+		
+		double accuracy = (double) (correctCount * 100) / (correctCount + wrongCount);
+		return accuracy;
 	}
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException{
@@ -268,10 +307,10 @@ public class Framework {
 		String wrong;    // The strings to find the edit distance between
 		System.out.println("Enter wrong string");
 		wrong = br.readLine();
-		//obj.spellCheckEditDistance(wrong);
-		obj.spellCheckConfusionMatrices(wrong);
 		
-		    
+		System.out.println("The accuracy of Edit Distance Approach is: " + obj.checkAccuracy(Framework.EDIT_DISTANCE));
+		//obj.spellCheckEditDistance(wrong);
+		//obj.spellCheckConfusionMatrices(wrong);
 	}
 
 }

@@ -295,70 +295,25 @@ public class ErrorMatrices {
 	public void printIMatrix()
 	{
 		System.out.println("\n---- I matrix ----\n");
-		System.out.print("     ");
-		for(int i = 'a' ; i <= 'z' ; i++)
-			System.out.print("    "+(char)i);
-		System.out.println();
-		for(int i=0; i<27; i++)
-		{
-			System.out.print((char)(i+96)+" ");
-			for(int j=0; j<27; j++)
-				System.out.printf("%4d ",iMatrix[i][j]);
-			System.out.println();
-			
-		}
+		Utilities.printErrorMatrix(iMatrix);
 	}
 	
 	public void printDMatrix()
 	{
 		System.out.println("\n---- D matrix ----\n");
-		System.out.print("     ");
-		for(int i = 'a' ; i <= 'z' ; i++)
-			System.out.print("    "+(char)i);
-		System.out.println();
-		
-		for(int i=0; i<27; i++)
-		{
-			System.out.print((char)(i+96)+" ");
-			for(int j=0; j<27; j++)
-				System.out.printf("%4d ",dMatrix[i][j]);
-			System.out.println();
-		}
+		Utilities.printErrorMatrix(dMatrix);
 	}
 	
 	public void printSMatrix()
 	{
 		System.out.println("\n---- S matrix ----\n");
-		System.out.print("     ");
-		for(int i = 'a' ; i <= 'z' ; i++)
-			System.out.print("    "+(char)i);
-		System.out.println();
-		
-		for(int i=0; i<27; i++)
-		{
-			System.out.print((char)(i+96)+" ");
-			for(int j=0; j<27; j++)
-				System.out.printf("%4d ",sMatrix[i][j]);
-			System.out.println();
-		}
+		Utilities.printErrorMatrix(sMatrix);
 	}
 	
 	public void printXMatrix()
 	{
 		System.out.println("\n---- X matrix ----\n");
-		System.out.print("     ");
-		for(int i = 'a' ; i <= 'z' ; i++)
-			System.out.print("    "+(char)i);
-		System.out.println();
-		
-		for(int i=0; i<27; i++)
-		{
-			System.out.print((char)(i+96)+" ");
-			
-			for(int j=0; j<27; j++)
-				System.out.printf("%4d ",xMatrix[i][j]);
-			System.out.println();
-		}
+		Utilities.printErrorMatrix(xMatrix);
 	}
 	
 	public static void main(String[] args) {
