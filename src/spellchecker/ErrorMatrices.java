@@ -185,6 +185,14 @@ public class ErrorMatrices {
 	 * it then updates appropriate matrix with error count values*/
 	public void updateMatrices(String wrong, String correct)
 	{
+		
+		charCount[0]++;
+		for(int i = 0 ; i < correct.length() ; i++)
+		{
+		//update charCount of ith character
+		charCount[charIndex.get(correct.charAt(i))] ++;
+		}
+		
 		int result[] = findError(wrong, correct);
 		
 		switch(result[0])
@@ -223,6 +231,10 @@ public class ErrorMatrices {
 		}
 	}
 	
+	/*
+	 * P(second/first) with respect to insertion 
+	 * i.e. probability that 'second' char is inserted after 'first' char
+	 * */
 	public double getIProbability(int first, int second)
 	{
 		double probability;
@@ -232,6 +244,10 @@ public class ErrorMatrices {
 		return probability;
 	}
 	
+	/*
+	 * P(second/first) with respect to deletion 
+	 * i.e. probability that 'second' char is deleted after 'first' char
+	 * */
 	public double getDProbability(int first, int second)
 	{
 		double probability;
@@ -241,6 +257,10 @@ public class ErrorMatrices {
 		return probability;
 	}
 	
+	/*
+	 * P(second/first) with respect to substitution
+	 * i.e. probability that 'second' char is substituted for 'first' char
+	 * */
 	public double getSProbability(int first, int second)
 	{
 		double probability;
@@ -250,6 +270,10 @@ public class ErrorMatrices {
 		return probability;
 	}
 	
+	/*
+	 * P(second/first) with respect to transposition 
+	 * i.e. probability that 'second' char is exchanged with 'first' char
+	 * */
 	public double getXProbability(int first, int second)
 	{
 		double probability;

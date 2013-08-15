@@ -120,6 +120,7 @@ public class Bigrams
 	public void printProbabilities()
 	{
 		
+		computeProbabilities();
 		
 		System.out.println("---- BIGRAM PROBABILITIES ----");
 		System.out.print("   ");
