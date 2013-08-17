@@ -21,8 +21,57 @@ import java.util.Set;
 
 public class Framework {
 
+	/*
+		Custom class created to define a data set: Training set or Test set
+		Data members: ArrayLists of correct words and corresponding wrong words
+		Function: createFold() to create folds of data for cross-validation and return them
+	*/
+	public class DataSet
+	{
+		public ArrayList<String> correctWords = new ArrayList<String>();
+		public ArrayList<String> wrongWords = new ArrayList<String>();
+		
+		/*
+			Function createFold() which accepts a fold number (zero-based) and the total number of folds
+			Returns an array of Datasets as follows:
+			DataSet[0] contains training set, DataSet[1] contains test set
+		*/
+		public DataSet[] createFold(int foldNo, int totalFolds)
+		{
+			DataSet[] foldSets = new DataSet[2];
+			foldSets[0] = new DataSet();
+			foldSets[1] = new DataSet();
+			
+			//For DataSet[1] (testing set), get all words from (len(DataSet)*foldNo / totalFolds) to ((len(DataSet)*(foldNo+1) / totalFolds) - 1)
+			int testSetStart = correctWords.size() * foldNo / totalFolds;
+			int testSetEnd = correctWords.size() * (foldNo + 1) / totalFolds;
+			//foldSets[1].correctWords = (ArrayList<String>) correctWords.subList(testSetStart, testSetEnd);
+			//foldSets[1].wrongWords = (ArrayList<String>) wrongWords.subList(testSetStart, testSetEnd);
+			
+			for(int i=testSetStart; i<testSetEnd; i++)
+			{
+				foldSets[1].correctWords.add(correctWords.get(i));
+				foldSets[1].wrongWords.add(wrongWords.get(i));
+			}
+			
+			//For DataSet[0] (training set), get everything not in test set
+			for(int i=0; i<correctWords.size(); i++)
+			{
+				// If test set does not contain the word, add it, and its corresponding wrong word to train set
+				if(!foldSets[1].correctWords.contains(correctWords.get(i)))
+				{
+					foldSets[0].correctWords.add(correctWords.get(i));
+					foldSets[0].wrongWords.add(wrongWords.get(i));
+				}
+			}
+			
+			return foldSets;
+		}
+	}
+
 	ArrayList<String> correctWords = new ArrayList<String>();	// Why not HashSet here too? - Sagar
 	ArrayList<String> wrongWords = new ArrayList<String>();
+	DataSet dataSet = new DataSet();
 	
 	Bigrams bigrams = new Bigrams();
 	
@@ -30,6 +79,8 @@ public class Framework {
 	
 	static final int EDIT_DISTANCE = 0;
 	static final int CONFUSION_MATRIX = 1;
+	
+	static final int NUMBER_OF_FOLDS = 5;
 	
 	public void readFile() throws FileNotFoundException,IOException
 	{
@@ -68,7 +119,7 @@ public class Framework {
 			*/
 			
 			if(Utilities.isValid(parts[0]) && Utilities.isValid(parts[1]))
-				errorMatrices.updateMatrices(parts[0], parts[1]);
+				errorMatrices.updateMatrices(parts[0], parts[1]);	// During cross-validation, needs to be performed ONLY ON TRAINING SET
 			
 		}
 		
@@ -88,6 +139,10 @@ public class Framework {
 		{
 			//System.out.println(i+": " + correctWords.get(i));	Temporarily commented out - Sagar
 		}
+		
+		// Sagar - Temporarily creating DataSet here, NEEDS TO BE CHANGED
+		dataSet.correctWords = correctWords;
+		dataSet.wrongWords = wrongWords;
 	}
 	
 	/*
@@ -174,19 +229,28 @@ public class Framework {
         return(d[m][n]);
 	}
 	
-	public void spellCheckConfusionMatrices(String wrong)
+	
+	/*
+		Implements spell checker using confusion matrices (Kernighan approach).
+		Accepts a wrong string and a training set to obtain the error matrices & bigram probabilities
+		During cross-validation, trainSet is made up of "folds" from the full data
+		During actual spellcheck, trainSet will be the entire data itself
+	*/
+	public String spellCheckConfusionMatrices(String wrong, DataSet trainSet)
 	{
 		String correct;  
 		double probability = 0.0;
 	    System.out.println("Calculating probabilites with all possible words...");
 		double max = 0.0;
-		Set<String> candidates = new HashSet<String>();
+		// Set<String> candidates = new HashSet<String>();
+		String candidate = "";
 		
-		//iterate over all correct words in dictionary
-	    for (int i = 0 ; i < correctWords.size() ; i++)
+		//iterate over all correct words in training set ONLY
+	    for (int i = 0 ; i < trainSet.correctWords.size() ; i++)
 		{   
-			correct = correctWords.get(i); //get the ith correct word
+			correct = trainSet.correctWords.get(i); //get the ith correct word
 			probability  = bigrams.getProbability(correct); //find probability of the correct word itself 
+				
 			int result[] = errorMatrices.findError(wrong, correct); //detect the type of error and the characters involved in the error
 			
 			//System.out.println("type of error: "+result[0]);
@@ -242,53 +306,63 @@ public class Framework {
 			if ( max < probability ) //word with probability > max found
 			{
 				max = probability;
-				candidates.clear();
-				candidates.add(correct);
+				//candidates.clear();
+				//candidates.add(correct);
+				candidate = correct;
 			}
-			else if ( max == probability )
+			/* else if ( max == probability )
 			{
 				if(max != 0.0)
 					candidates.add(correct);
-			}
+			} */
 			else //probability < max so can't be a candidate
 			{	/*do nothing*/		}
 			
 		}
 	    System.out.println("\nmax probability: "+max);
 	    System.out.println("-----------------\nCorrect Word:\n------------------");
-	    Iterator<String> iterator = candidates.iterator();
+	    /* Iterator<String> iterator = candidates.iterator();
 	    while(iterator.hasNext())
 	    {
 	    	String candidateWord = iterator.next();
 	    	System.out.println(candidateWord);
-	    }
+	    } */
+		System.out.println("Candidate word: " + candidate);
 	    System.out.println("------------------");
-	   		
+	   	
+		return candidate;
 	}
 	
 	/*
 		Checks accuracy of a method on the test sets in correctWords and wrongWords and returns it
 		Working for methid = EDIT_DISTANCE, but not for CONFUSION_MATRIX
+		EDIT_DISTANCE requires only testSet as testing happens on entire set itself; so trainSet can be passed as null
+		CONFUSION_MATRIX requires cross-validation, so both sets should be appropriately filled
 	*/
-	public double checkAccuracy(int method)
+	public double checkAccuracy(int method, DataSet trainSet, DataSet testSet)
 	{
-		if(method == Framework.CONFUSION_MATRIX)
+		/* if(method == Framework.CONFUSION_MATRIX)
 		{
 			System.out.println("Under construction");
 			return -1.0;
-		}
+		} */
 	
 		int correctCount = 0;
 		int wrongCount = 0;
 		String predictedCorrect = "";
 		
-		for(int i=0; i<correctWords.size(); i++)
+		for(int i=0; i < testSet.correctWords.size(); i++)
 		{
-			String actualCorrect = correctWords.get(i);
-			String wrong = wrongWords.get(i);
+			String actualCorrect = testSet.correctWords.get(i);
+			String wrong = testSet.wrongWords.get(i);
 			
 			if(method == Framework.EDIT_DISTANCE)
 				predictedCorrect = spellCheckEditDistance(wrong);
+				
+			else if(method == Framework.CONFUSION_MATRIX)
+			{
+				predictedCorrect = spellCheckConfusionMatrices(wrong, trainSet);
+			}
 			
 			if(predictedCorrect.equals(actualCorrect))
 				correctCount++;
@@ -300,6 +374,41 @@ public class Framework {
 		return accuracy;
 	}
 	
+	/*
+		Computes accuracy using cross-validation
+		Not possible for Edit Distance, so returns -1.0
+		Accepts full data set so that it can be divided into training and test sets for each iteration of cross-validation
+	*/
+	public double checkCrossValidateAccuracy(int method, DataSet fullSet)
+	{
+		double totalAccuracy = 0.0;
+	
+		if(method == Framework.EDIT_DISTANCE)
+		{
+			System.err.println("Error: Cross-validation not possible on Edit Distance");
+			return -1.0;
+		}
+		
+		else if(method == Framework.CONFUSION_MATRIX)
+		{
+			// Now performing cross-validation
+			for(int i=0; i<Framework.NUMBER_OF_FOLDS; i++)
+			{
+				DataSet[] foldSets = fullSet.createFold(i, NUMBER_OF_FOLDS);	// Returns training set in [0] and test set in [1]
+				double currentAccuracy = checkAccuracy(method, foldSets[0], foldSets[1]);
+				totalAccuracy += currentAccuracy;	// Keeping track of sum of all iterations
+				
+				System.out.println("Accuracy for fold " + i + " = " + currentAccuracy);
+			}
+			
+			// Cross-validation done, now output results
+			return (totalAccuracy / Framework.NUMBER_OF_FOLDS);	// Return average of all folds
+		}
+	
+		System.out.println("Under Construction");
+			return -1.0;
+	}
+	
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		Framework obj = new Framework();
 		obj.readFile();
@@ -308,9 +417,10 @@ public class Framework {
 		System.out.println("Enter wrong string");
 		wrong = br.readLine();
 		
-		System.out.println("The accuracy of Edit Distance Approach is: " + obj.checkAccuracy(Framework.EDIT_DISTANCE));
+		//System.out.println("The accuracy of Edit Distance Approach is: " + obj.checkAccuracy(Framework.EDIT_DISTANCE, null, obj.dataSet));
 		//obj.spellCheckEditDistance(wrong);
-		//obj.spellCheckConfusionMatrices(wrong);
+		//obj.spellCheckConfusionMatrices(wrong, obj.dataSet);
+		System.out.println("The cross-validated accuracy of Confusion Matrices approach is: " + obj.checkCrossValidateAccuracy(Framework.CONFUSION_MATRIX, obj.dataSet));
 	}
 
 }
