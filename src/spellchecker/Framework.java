@@ -106,7 +106,7 @@ public class Framework {
 			String currentWrongWord = parts[0].toLowerCase(); //for things like America
 			
 			// Using isValid() function from spellchecker.Utilities class to get rid of corner cases
-			if (Utilities.isValid(currentCorrectWord) && !correctWords.contains(currentCorrectWord))
+			if (Utilities.isValid(currentCorrectWord) && Utilities.isValid(currentWrongWord) && !correctWords.contains(currentCorrectWord))
 			{
 				correctWords.add(currentCorrectWord);
 				wrongWords.add(currentWrongWord);
@@ -119,7 +119,7 @@ public class Framework {
 			*/
 			
 			if(Utilities.isValid(parts[0]) && Utilities.isValid(parts[1]))
-				errorMatrices.updateMatrices(parts[0], parts[1]);	// During cross-validation, needs to be performed ONLY ON TRAINING SET
+				errorMatrices.updateMatrices(parts[0], parts[1]);
 			
 		}
 		
@@ -233,10 +233,10 @@ public class Framework {
 	/*
 		Implements spell checker using confusion matrices (Kernighan approach).
 		Accepts a wrong string and a training set to obtain the error matrices & bigram probabilities
-		During cross-validation, trainSet is made up of "folds" from the full data
-		During actual spellcheck, trainSet will be the entire data itself
+		During cross-validation, testSet is made up of "folds" from the full data
+		During actual spellcheck, testSet will be the entire data itself
 	*/
-	public String spellCheckConfusionMatrices(String wrong, DataSet trainSet)
+	public String spellCheckConfusionMatrices(String wrong, DataSet testSet)
 	{
 		String correct;  
 		double probability = 0.0;
@@ -246,9 +246,9 @@ public class Framework {
 		String candidate = "";
 		
 		//iterate over all correct words in training set ONLY
-	    for (int i = 0 ; i < trainSet.correctWords.size() ; i++)
+	    for (int i = 0 ; i < testSet.correctWords.size() ; i++)
 		{   
-			correct = trainSet.correctWords.get(i); //get the ith correct word
+			correct = testSet.correctWords.get(i); //get the ith correct word
 			probability  = bigrams.getProbability(correct); //find probability of the correct word itself 
 				
 			int result[] = errorMatrices.findError(wrong, correct); //detect the type of error and the characters involved in the error
@@ -327,7 +327,7 @@ public class Framework {
 	    	String candidateWord = iterator.next();
 	    	System.out.println(candidateWord);
 	    } */
-		System.out.println("Candidate word: " + candidate);
+		System.out.println(candidate);
 	    System.out.println("------------------");
 	   	
 		return candidate;
@@ -361,7 +361,7 @@ public class Framework {
 				
 			else if(method == Framework.CONFUSION_MATRIX)
 			{
-				predictedCorrect = spellCheckConfusionMatrices(wrong, trainSet);
+				predictedCorrect = spellCheckConfusionMatrices(wrong, testSet);
 			}
 			
 			if(predictedCorrect.equals(actualCorrect))
@@ -395,6 +395,17 @@ public class Framework {
 			for(int i=0; i<Framework.NUMBER_OF_FOLDS; i++)
 			{
 				DataSet[] foldSets = fullSet.createFold(i, NUMBER_OF_FOLDS);	// Returns training set in [0] and test set in [1]
+				
+				// Retrain error matrices for current fold
+				errorMatrices.sMatrix = new int[27][27];
+				errorMatrices.xMatrix = new int[27][27];
+				errorMatrices.iMatrix = new int[27][27];
+				errorMatrices.dMatrix = new int[27][27];
+				errorMatrices.charCount = new int[27];
+				
+				for(int j=0; j<foldSets[0].correctWords.size(); j++)
+					errorMatrices.updateMatrices(foldSets[0].wrongWords.get(j), foldSets[0].correctWords.get(j));
+				
 				double currentAccuracy = checkAccuracy(method, foldSets[0], foldSets[1]);
 				totalAccuracy += currentAccuracy;	// Keeping track of sum of all iterations
 				
@@ -414,8 +425,8 @@ public class Framework {
 		obj.readFile();
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		String wrong;    // The strings to find the edit distance between
-		System.out.println("Enter wrong string");
-		wrong = br.readLine();
+		//System.out.println("Enter wrong string");
+		//wrong = br.readLine();
 		
 		//System.out.println("The accuracy of Edit Distance Approach is: " + obj.checkAccuracy(Framework.EDIT_DISTANCE, null, obj.dataSet));
 		//obj.spellCheckEditDistance(wrong);
