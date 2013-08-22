@@ -239,7 +239,7 @@ public class ErrorMatrices {
 	{
 		double probability;
 		
-		probability = (double)iMatrix[first][second] / charCount[first];
+		probability = (double)(iMatrix[first][second] + 0.1) / (charCount[first] +2.7);
 		
 		return probability;
 	}
@@ -252,7 +252,7 @@ public class ErrorMatrices {
 	{
 		double probability;
 		
-		probability = (double)dMatrix[first][second] / charCount[first];
+		probability = (double)(dMatrix[first][second] +0.1)/ (charCount[first] +2.7);
 		
 		return probability;
 	}
@@ -265,7 +265,7 @@ public class ErrorMatrices {
 	{
 		double probability;
 		
-		probability = (double)sMatrix[first][second] / charCount[first];
+		probability = (double)(sMatrix[first][second] + 0.1) / (charCount[first]+2.7);
 		
 		return probability;
 	}
@@ -278,7 +278,7 @@ public class ErrorMatrices {
 	{
 		double probability;
 		
-		probability = (double)xMatrix[first][second] / charCount[first];
+		probability = (double)(xMatrix[first][second] + 0.1) /( charCount[first] +2.7);
 		
 		return probability;
 	}

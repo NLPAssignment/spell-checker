@@ -134,7 +134,7 @@ public class Framework {
 		//correctWords contains a non repeating complete list of correct words
 		
 		 //prints all correct words list
-		System.out.println("\n--CORRECT DICTIONARY WORDS--\n");
+		//System.out.println("\n--CORRECT DICTIONARY WORDS--\n");
 		for (int i = 0; i< correctWords.size() ; i++)
 		{
 			//System.out.println(i+": " + correctWords.get(i));	Temporarily commented out - Sagar
@@ -154,7 +154,7 @@ public class Framework {
 	{
 		String correct;  
 		int distance=0;
-	    System.out.println("Calculating distances of wrong word from all possible words...");
+	    //System.out.println("Calculating distances of wrong word from all possible words...");
 		int min = Integer.MAX_VALUE;
 		Set<String> candidates = new HashSet<String>();
 		
@@ -181,8 +181,8 @@ public class Framework {
 			//System.out.println("The edit distance between \"" + wrong + "\" and \"" + correct + "\" is " + distance);
 			
 		}
-	    System.out.println("min distance: "+min);
-	    System.out.println("-----------------\nCandidates:\n------------------");
+	    //System.out.println("min distance: "+min);
+	    //System.out.println("-----------------\nCandidates:\n------------------");
 	    Iterator<String> iterator = candidates.iterator();
 	    double candidateProbability = 0.0;
 	    double maxProbability = 0.0;
@@ -190,7 +190,7 @@ public class Framework {
 	    while(iterator.hasNext())
 	    {
 	    	String candidateWord = iterator.next();
-	    	System.out.println(candidateWord);
+	    	//System.out.println(candidateWord);
 	    	candidateProbability = bigrams.getProbability(candidateWord);
 	    	if(maxProbability < candidateProbability)
 	    	{
@@ -198,8 +198,8 @@ public class Framework {
 	    		best = candidateWord;
 	    	}
 	    }
-	    System.out.println("-----------------");
-	    System.out.println("Best Word: " + best);
+	    //System.out.println("-----------------");
+	    //System.out.println("Best Word: " + best);
 		
 		return best;
 	}
@@ -240,7 +240,7 @@ public class Framework {
 	{
 		String correct;  
 		double probability = 0.0;
-	    System.out.println("Calculating probabilites with all possible words...");
+	    //System.out.println("Calculating probabilites with all possible words...");
 		double max = 0.0;
 		// Set<String> candidates = new HashSet<String>();
 		String candidate = "";
@@ -263,35 +263,35 @@ public class Framework {
 				probability = 1; //p=1 since we have found a dictionary word 
 			
 			case ErrorMatrices.INSERTION: 
-				System.out.println("Candidate Word: "+correct);
-				System.out.println("p(c): "+probability);
+			//	System.out.println("Candidate Word: "+correct);
+				//System.out.println("p(c): "+probability);
 				probability *= errorMatrices.getIProbability(result[1], result[2]);  //so far probability contained P(C),  now we mult it by P(W/C) wrt insertion
-				System.out.println("p(w/c): "+errorMatrices.getIProbability(result[1], result[2]));
-				System.out.println("p(c/w): "+probability);
+				//System.out.println("p(w/c): "+errorMatrices.getIProbability(result[1], result[2]));
+				//System.out.println("p(c/w): "+probability);
 				break;
 			
 			case ErrorMatrices.DELETION:
-				System.out.println("Candidate Word: "+correct);
-				System.out.println("p(c): "+probability);
+				//System.out.println("Candidate Word: "+correct);
+				//System.out.println("p(c): "+probability);
 				probability *= errorMatrices.getDProbability(result[1], result[2]); 
-				System.out.println("p(w/c): "+errorMatrices.getDProbability(result[1], result[2]));
-				System.out.println("p(c/w): "+probability);
+				//System.out.println("p(w/c): "+errorMatrices.getDProbability(result[1], result[2]));
+				//System.out.println("p(c/w): "+probability);
 				break;
 			
 			case ErrorMatrices.SUBSTITUTION:
-				System.out.println("Candidate Word: "+correct);
-				System.out.println("p(c): "+probability);
+				//System.out.println("Candidate Word: "+correct);
+				//System.out.println("p(c): "+probability);
 				probability *= errorMatrices.getSProbability(result[1], result[2]); 
-				System.out.println("p(w/c): "+errorMatrices.getSProbability(result[1], result[2]));
-				System.out.println("p(c/w): "+probability);
+				//System.out.println("p(w/c): "+errorMatrices.getSProbability(result[1], result[2]));
+				//System.out.println("p(c/w): "+probability);
 				break;
 			
 			case ErrorMatrices.TRANSPOSITION:
-				System.out.println("Candidate Word: "+correct);
-				System.out.println("p(c): "+probability);
+				//System.out.println("Candidate Word: "+correct);
+				//System.out.println("p(c): "+probability);
 				probability *= errorMatrices.getXProbability(result[1], result[2]); 
-				System.out.println("p(w/c): "+errorMatrices.getXProbability(result[1], result[2]));
-				System.out.println("p(c/w): "+probability);
+				//System.out.println("p(w/c): "+errorMatrices.getXProbability(result[1], result[2]));
+				//System.out.println("p(c/w): "+probability);
 				break;
 			
 			case ErrorMatrices.UNKNOWN_ERROR: 
@@ -319,16 +319,18 @@ public class Framework {
 			{	/*do nothing*/		}
 			
 		}
-	    System.out.println("\nmax probability: "+max);
-	    System.out.println("-----------------\nCorrect Word:\n------------------");
+	    //System.out.println("\nmax probability: "+max);
+	    //System.out.println("-----------------\nCorrect Word:\n------------------");
+	    
 	    /* Iterator<String> iterator = candidates.iterator();
 	    while(iterator.hasNext())
 	    {
 	    	String candidateWord = iterator.next();
 	    	System.out.println(candidateWord);
 	    } */
-		System.out.println(candidate);
-	    System.out.println("------------------");
+		
+	    //System.out.println(candidate);
+	    //System.out.println("------------------");
 	   	
 		return candidate;
 	}
@@ -428,7 +430,7 @@ public class Framework {
 		//System.out.println("Enter wrong string");
 		//wrong = br.readLine();
 		
-		//System.out.println("The accuracy of Edit Distance Approach is: " + obj.checkAccuracy(Framework.EDIT_DISTANCE, null, obj.dataSet));
+		System.out.println("The accuracy of Edit Distance Approach is: " + obj.checkAccuracy(Framework.EDIT_DISTANCE, null, obj.dataSet));
 		//obj.spellCheckEditDistance(wrong);
 		//obj.spellCheckConfusionMatrices(wrong, obj.dataSet);
 		System.out.println("The cross-validated accuracy of Confusion Matrices approach is: " + obj.checkCrossValidateAccuracy(Framework.CONFUSION_MATRIX, obj.dataSet));
