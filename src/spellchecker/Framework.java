@@ -422,15 +422,33 @@ public class Framework {
 			return -1.0;
 	}
 	
+	public void analyseConfusionMatrices() throws IOException
+	{
+		BufferedReader br = new BufferedReader((new InputStreamReader(System.in)));
+		System.out.println("Confusion Matrix Analysis: \n" +
+				"1 Insert\n" +
+				"2 Delete\n" +
+				"3 Substitute\n" +
+				"4 Transpose\n" +
+				"Enter error type: ");
+		int errorType = Integer.parseInt(br.readLine());
+		System.out.println("Enter first letter: ");
+		char first = br.readLine().charAt(0);
+		System.out.println("Enter second letter: ");
+		char second = (char)br.readLine().charAt(0);
+		errorMatrices.setAnalysisParameters(first, second, errorType);
+	}
+	
+	
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		Framework obj = new Framework();
+		obj.analyseConfusionMatrices();
 		obj.readFile();
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		String wrong;    // The strings to find the edit distance between
 		//System.out.println("Enter wrong string");
-		//wrong = br.readLine();
 		
-		System.out.println("The accuracy of Edit Distance Approach is: " + obj.checkAccuracy(Framework.EDIT_DISTANCE, null, obj.dataSet));
+		//System.out.println("The accuracy of Edit Distance Approach is: " + obj.checkAccuracy(Framework.EDIT_DISTANCE, null, obj.dataSet));
 		//obj.spellCheckEditDistance(wrong);
 		//obj.spellCheckConfusionMatrices(wrong, obj.dataSet);
 		System.out.println("The cross-validated accuracy of Confusion Matrices approach is: " + obj.checkCrossValidateAccuracy(Framework.CONFUSION_MATRIX, obj.dataSet));

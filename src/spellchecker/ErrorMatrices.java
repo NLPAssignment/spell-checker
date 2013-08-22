@@ -21,7 +21,15 @@ public class ErrorMatrices {
 	static final int TRANSPOSITION 	= 	4;
 	static final int UNKNOWN_ERROR 	= 	5;
 	
-	
+	char first;
+	char second; 
+	int errorType=0;
+	public void setAnalysisParameters(char f, char s, int e)
+	{
+		first = f; 
+		 second = s; 
+		 errorType = e;
+	}
 	//	charIndex assigns numbers for a to z
 	
 	HashMap<Character, Integer> charIndex = new HashMap<Character, Integer>();
@@ -204,22 +212,26 @@ public class ErrorMatrices {
 			break;
 		
 		case INSERTION:
-			
+			if (errorType == 1 && result[1] == charIndex.get(first) && result[2] == charIndex.get(second))
+				System.out.println(wrong+" --> "+correct);
 			iMatrix[ result[1] ][ result[2] ] ++ ; //update insertion matrix
 			break;
 		
 		case DELETION:
-		
+			if (errorType == 2 && result[1] == charIndex.get(first) && result[2] == charIndex.get(second))
+				System.out.println(wrong+" --> "+correct);
 			dMatrix[ result[1] ][ result[2] ] ++ ; //update deletion matrix
 			break;
 		
 		case SUBSTITUTION:
-			
+			if (errorType == 3 && result[1] == charIndex.get(first) && result[2] == charIndex.get(second))
+				System.out.println(wrong+" --> "+correct);
 			sMatrix[ result[1] ][ result[2] ] ++ ; //update substitution matrix
 			break;
 		
 		case TRANSPOSITION:
-			
+			if (errorType == 4 && result[1] == charIndex.get(first) && result[2] == charIndex.get(second))
+				System.out.println(wrong+" --> "+correct);
 			xMatrix[ result[1] ][ result[2] ] ++ ; //update transposition matrix
 			break;
 		
