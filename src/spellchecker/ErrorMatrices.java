@@ -251,7 +251,7 @@ public class ErrorMatrices {
 	{
 		double probability;
 		
-		probability = (double)(iMatrix[first][second] + 0.1) / (charCount[first] +2.7);
+		probability = (double)(iMatrix[first][second] +1) / (charCount[first] +27);
 		
 		return probability;
 	}
@@ -264,7 +264,7 @@ public class ErrorMatrices {
 	{
 		double probability;
 		
-		probability = (double)(dMatrix[first][second] +0.1)/ (charCount[first] +2.7);
+		probability = (double)(dMatrix[first][second] +1)/ (charCount[first] +27);
 		
 		return probability;
 	}
@@ -277,7 +277,7 @@ public class ErrorMatrices {
 	{
 		double probability;
 		
-		probability = (double)(sMatrix[first][second] + 0.1) / (charCount[first]+2.7);
+		probability = (double)(sMatrix[first][second] + 1) / (charCount[first]+27);
 		
 		return probability;
 	}
@@ -290,7 +290,7 @@ public class ErrorMatrices {
 	{
 		double probability;
 		
-		probability = (double)(xMatrix[first][second] + 0.1) /( charCount[first] +2.7);
+		probability = (double)(xMatrix[first][second] + 1) /( charCount[first] +27);
 		
 		return probability;
 	}
@@ -298,9 +298,10 @@ public class ErrorMatrices {
 	public void printCounts()
 	{
 		System.out.println("\n---COUNTS---\n");
-		for ( int i = 0 ; i < charCount.length ; i ++ )
+		char ch = 96;
+		for ( int i = 0 ; i < charCount.length ; i ++ , ch++)
 		{
-			System.out.println(i+" : "+charCount[i]);
+			System.out.println(ch+" : "+charCount[i]);
 		}
 	}
 	

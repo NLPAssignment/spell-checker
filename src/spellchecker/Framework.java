@@ -21,6 +21,11 @@ import java.util.Set;
 
 public class Framework {
 
+	BigWordCounts bigWordCounts = new BigWordCounts();
+	public Framework() throws IOException
+	{
+		bigWordCounts.readCorpus();
+	}
 	/*
 		Custom class created to define a data set: Training set or Test set
 		Data members: ArrayLists of correct words and corresponding wrong words
@@ -84,6 +89,21 @@ public class Framework {
 	
 	public void readFile() throws FileNotFoundException,IOException
 	{
+		/* lekha - generating bigrams from big.txt instead of wikipedia corpus
+		BufferedReader br2 = new BufferedReader(new FileReader("big.txt"));
+		System.out.println("Reading corpus...");
+		String line2;
+		while((line2 = br2.readLine()) != null)
+		{
+			String words[] = line2.split(" ");
+			for (int i = 0 ; i < words.length ; i++)
+			{
+				if(Utilities.isValid(words[i]))
+					bigrams.update(words[i]);
+			}
+		}
+		*/
+		
 		//open the parallel corpus file
 		BufferedReader br = new BufferedReader(new FileReader("words.txt"));
 		
@@ -110,7 +130,7 @@ public class Framework {
 			{
 				correctWords.add(currentCorrectWord);
 				wrongWords.add(currentWrongWord);
-				bigrams.update(currentCorrectWord); //updates bigram counts					
+				bigrams.update(currentCorrectWord); //updates bigram counts
 			}
 			
 			/*
@@ -181,8 +201,8 @@ public class Framework {
 			//System.out.println("The edit distance between \"" + wrong + "\" and \"" + correct + "\" is " + distance);
 			
 		}
-	    //System.out.println("min distance: "+min);
-	    //System.out.println("-----------------\nCandidates:\n------------------");
+	    System.out.println("min distance: "+min);
+	    System.out.println("-----------------\nCandidates:\n------------------");
 	    Iterator<String> iterator = candidates.iterator();
 	    double candidateProbability = 0.0;
 	    double maxProbability = 0.0;
@@ -190,16 +210,16 @@ public class Framework {
 	    while(iterator.hasNext())
 	    {
 	    	String candidateWord = iterator.next();
-	    	//System.out.println(candidateWord);
-	    	candidateProbability = bigrams.getProbability(candidateWord);
+	    	System.out.println(candidateWord);
+	    	candidateProbability = bigrams.getProbability(candidateWord);//bigWordCounts.getProbability(candidateWord); 
 	    	if(maxProbability < candidateProbability)
 	    	{
 	    		maxProbability = candidateProbability;
 	    		best = candidateWord;
 	    	}
 	    }
-	    //System.out.println("-----------------");
-	    //System.out.println("Best Word: " + best);
+	    System.out.println("-----------------");
+	    System.out.println("Best Word: " + best);
 		
 		return best;
 	}
@@ -249,7 +269,7 @@ public class Framework {
 	    for (int i = 0 ; i < testSet.correctWords.size() ; i++)
 		{   
 			correct = testSet.correctWords.get(i); //get the ith correct word
-			probability  = bigrams.getProbability(correct); //find probability of the correct word itself 
+			probability  = bigrams.getProbability(correct);//bigWordCounts.getProbability(correct); //find probability of the correct word itself 
 				
 			int result[] = errorMatrices.findError(wrong, correct); //detect the type of error and the characters involved in the error
 			
@@ -263,35 +283,35 @@ public class Framework {
 				probability = 1; //p=1 since we have found a dictionary word 
 			
 			case ErrorMatrices.INSERTION: 
-			//	System.out.println("Candidate Word: "+correct);
-				//System.out.println("p(c): "+probability);
+				System.out.println("Candidate Word: "+correct);
+				System.out.println("p(c): "+probability);
 				probability *= errorMatrices.getIProbability(result[1], result[2]);  //so far probability contained P(C),  now we mult it by P(W/C) wrt insertion
-				//System.out.println("p(w/c): "+errorMatrices.getIProbability(result[1], result[2]));
-				//System.out.println("p(c/w): "+probability);
+				System.out.println("p(w/c): "+errorMatrices.getIProbability(result[1], result[2]));
+				System.out.println("p(c/w): "+probability);
 				break;
 			
 			case ErrorMatrices.DELETION:
-				//System.out.println("Candidate Word: "+correct);
-				//System.out.println("p(c): "+probability);
+				System.out.println("Candidate Word: "+correct);
+				System.out.println("p(c): "+probability);
 				probability *= errorMatrices.getDProbability(result[1], result[2]); 
-				//System.out.println("p(w/c): "+errorMatrices.getDProbability(result[1], result[2]));
-				//System.out.println("p(c/w): "+probability);
+				System.out.println("p(w/c): "+errorMatrices.getDProbability(result[1], result[2]));
+				System.out.println("p(c/w): "+probability);
 				break;
 			
 			case ErrorMatrices.SUBSTITUTION:
-				//System.out.println("Candidate Word: "+correct);
-				//System.out.println("p(c): "+probability);
+				System.out.println("Candidate Word: "+correct);
+				System.out.println("p(c): "+probability);
 				probability *= errorMatrices.getSProbability(result[1], result[2]); 
-				//System.out.println("p(w/c): "+errorMatrices.getSProbability(result[1], result[2]));
-				//System.out.println("p(c/w): "+probability);
+				System.out.println("p(w/c): "+errorMatrices.getSProbability(result[1], result[2]));
+				System.out.println("p(c/w): "+probability);
 				break;
 			
 			case ErrorMatrices.TRANSPOSITION:
-				//System.out.println("Candidate Word: "+correct);
-				//System.out.println("p(c): "+probability);
+				System.out.println("Candidate Word: "+correct);
+				System.out.println("p(c): "+probability);
 				probability *= errorMatrices.getXProbability(result[1], result[2]); 
-				//System.out.println("p(w/c): "+errorMatrices.getXProbability(result[1], result[2]));
-				//System.out.println("p(c/w): "+probability);
+				System.out.println("p(w/c): "+errorMatrices.getXProbability(result[1], result[2]));
+				System.out.println("p(c/w): "+probability);
 				break;
 			
 			case ErrorMatrices.UNKNOWN_ERROR: 
@@ -319,8 +339,8 @@ public class Framework {
 			{	/*do nothing*/		}
 			
 		}
-	    //System.out.println("\nmax probability: "+max);
-	    //System.out.println("-----------------\nCorrect Word:\n------------------");
+	    System.out.println("\nmax probability: "+max);
+	    System.out.println("-----------------\nCorrect Word:\n------------------");
 	    
 	    /* Iterator<String> iterator = candidates.iterator();
 	    while(iterator.hasNext())
@@ -329,8 +349,8 @@ public class Framework {
 	    	System.out.println(candidateWord);
 	    } */
 		
-	    //System.out.println(candidate);
-	    //System.out.println("------------------");
+	    System.out.println(candidate);
+	    System.out.println("------------------");
 	   	
 		return candidate;
 	}
@@ -441,17 +461,25 @@ public class Framework {
 	
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException{
+		
 		Framework obj = new Framework();
-		obj.analyseConfusionMatrices();
+		
+		//obj.analyseConfusionMatrices(); //takes user input to find instances of a specific error
+		
 		obj.readFile();
+		
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		String wrong;    // The strings to find the edit distance between
 		//System.out.println("Enter wrong string");
+		//wrong = br.readLine();
 		
-		//System.out.println("The accuracy of Edit Distance Approach is: " + obj.checkAccuracy(Framework.EDIT_DISTANCE, null, obj.dataSet));
+		System.out.println("The accuracy of Edit Distance Approach is: " + obj.checkAccuracy(Framework.EDIT_DISTANCE, null, obj.dataSet));
+		//System.out.println("\nEdit distance: ");
 		//obj.spellCheckEditDistance(wrong);
+		//System.out.println("\nConfusion Matrices Approach: ");
 		//obj.spellCheckConfusionMatrices(wrong, obj.dataSet);
-		System.out.println("The cross-validated accuracy of Confusion Matrices approach is: " + obj.checkCrossValidateAccuracy(Framework.CONFUSION_MATRIX, obj.dataSet));
+		
+		//System.out.println("The cross-validated accuracy of Confusion Matrices approach is: " + obj.checkCrossValidateAccuracy(Framework.CONFUSION_MATRIX, obj.dataSet));
 	}
 
 }

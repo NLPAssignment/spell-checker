@@ -26,6 +26,9 @@ public class Bigrams
 	
 	//	bigramProbabilities is the same as bigramCounts, except that it computes probabilities.
 	double[][] bigramProbabilities = new double[27][27];
+
+	//	total word lengths and number of words for brevity penalty
+	int totalLength = 0, totalNumber = 0;
 	
 	//	charIndex assigns numbers for a to z
 	HashMap<Character, Integer> charIndex = new HashMap<Character, Integer>();
@@ -51,6 +54,10 @@ public class Bigrams
 	*/
 	public void update(String word)
 	{
+		// Update word counts
+		totalNumber++;
+		totalLength += word.length();
+
 		//System.out.println(word);
 		// For first letter, update bigramCounts[0][charIndex] as it is null followed by char
 		bigramCounts[0][charIndex.get(word.charAt(0))]++;
@@ -93,6 +100,20 @@ public class Bigrams
 		
 		prob *= bigramProbabilities[charIndex.get(word.charAt(word.length()-1))][0];
 		
+		// For brevity penalty, first find average
+		double avgLength = (double) totalLength / totalNumber;
+		double bp = 1.0;	// Default Brevity Penalty value assuming long word; will check in next line
+
+		System.out.println("Average length: " + avgLength);
+
+		// Now check if it is applicable and multiply accordingly
+		if(word.length() < avgLength)
+			bp = Math.exp((1-avgLength)/word.length());
+
+		System.out.println("Brevity penalty: " + bp);
+
+		prob *= bp;	// Multiplying by brevity penalty
+
 		return prob;
 	}
 	
