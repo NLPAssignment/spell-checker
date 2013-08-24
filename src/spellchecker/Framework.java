@@ -211,8 +211,9 @@ public class Framework {
 	    {
 	    	String candidateWord = iterator.next();
 	    	System.out.println(candidateWord);
-	    	candidateProbability = bigrams.getProbability(candidateWord);//bigWordCounts.getProbability(candidateWord); 
-	    	if(maxProbability < candidateProbability)
+	    	//candidateProbability = bigrams.getProbability(candidateWord);
+	    	candidateProbability = bigWordCounts.getProbability(candidateWord); 
+	    	if(maxProbability <= candidateProbability)
 	    	{
 	    		maxProbability = candidateProbability;
 	    		best = candidateWord;
@@ -269,7 +270,8 @@ public class Framework {
 	    for (int i = 0 ; i < testSet.correctWords.size() ; i++)
 		{   
 			correct = testSet.correctWords.get(i); //get the ith correct word
-			probability  = bigrams.getProbability(correct);//bigWordCounts.getProbability(correct); //find probability of the correct word itself 
+			//probability  = bigrams.getProbability(correct);
+			probability = bigWordCounts.getProbability(correct); //find probability of the correct word itself 
 				
 			int result[] = errorMatrices.findError(wrong, correct); //detect the type of error and the characters involved in the error
 			

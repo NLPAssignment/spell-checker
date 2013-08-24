@@ -55,7 +55,9 @@ public class BigWordCounts {
 	
 	public double getProbability(String word)
 	{
-		return (double) (getCount(word)+1) / (totalWordCount + wordCounts.size()); 
+		return (double) getCount(word) / (totalWordCount); 
+			
+		//return (double) (getCount(word)+1) / (totalWordCount + wordCounts.size()); 
 	}
 	
 	public int getTotalWordCount()
