@@ -266,7 +266,7 @@ public class Framework {
 		// Set<String> candidates = new HashSet<String>();
 		String candidate = "";
 		
-		//iterate over all correct words in training set ONLY
+		//iterate over all correct words in test set
 	    for (int i = 0 ; i < testSet.correctWords.size() ; i++)
 		{   
 			correct = testSet.correctWords.get(i); //get the ith correct word
@@ -285,35 +285,35 @@ public class Framework {
 				probability = 1; //p=1 since we have found a dictionary word 
 			
 			case ErrorMatrices.INSERTION: 
-				System.out.println("Candidate Word: "+correct);
-				System.out.println("p(c): "+probability);
+				//System.out.println("Candidate Word: "+correct);
+				//System.out.println("p(c): "+probability);
 				probability *= errorMatrices.getIProbability(result[1], result[2]);  //so far probability contained P(C),  now we mult it by P(W/C) wrt insertion
-				System.out.println("p(w/c): "+errorMatrices.getIProbability(result[1], result[2]));
-				System.out.println("p(c/w): "+probability);
+				//System.out.println("p(w/c): "+errorMatrices.getIProbability(result[1], result[2]));
+				//System.out.println("p(c/w): "+probability);
 				break;
 			
 			case ErrorMatrices.DELETION:
-				System.out.println("Candidate Word: "+correct);
-				System.out.println("p(c): "+probability);
+				//System.out.println("Candidate Word: "+correct);
+				//System.out.println("p(c): "+probability);
 				probability *= errorMatrices.getDProbability(result[1], result[2]); 
-				System.out.println("p(w/c): "+errorMatrices.getDProbability(result[1], result[2]));
-				System.out.println("p(c/w): "+probability);
+				//System.out.println("p(w/c): "+errorMatrices.getDProbability(result[1], result[2]));
+				//System.out.println("p(c/w): "+probability);
 				break;
 			
 			case ErrorMatrices.SUBSTITUTION:
-				System.out.println("Candidate Word: "+correct);
-				System.out.println("p(c): "+probability);
+				//System.out.println("Candidate Word: "+correct);
+				//System.out.println("p(c): "+probability);
 				probability *= errorMatrices.getSProbability(result[1], result[2]); 
-				System.out.println("p(w/c): "+errorMatrices.getSProbability(result[1], result[2]));
-				System.out.println("p(c/w): "+probability);
+				//System.out.println("p(w/c): "+errorMatrices.getSProbability(result[1], result[2]));
+				//System.out.println("p(c/w): "+probability);
 				break;
 			
 			case ErrorMatrices.TRANSPOSITION:
-				System.out.println("Candidate Word: "+correct);
-				System.out.println("p(c): "+probability);
+				//System.out.println("Candidate Word: "+correct);
+				//System.out.println("p(c): "+probability);
 				probability *= errorMatrices.getXProbability(result[1], result[2]); 
-				System.out.println("p(w/c): "+errorMatrices.getXProbability(result[1], result[2]));
-				System.out.println("p(c/w): "+probability);
+				//System.out.println("p(w/c): "+errorMatrices.getXProbability(result[1], result[2]));
+				//System.out.println("p(c/w): "+probability);
 				break;
 			
 			case ErrorMatrices.UNKNOWN_ERROR: 
@@ -365,12 +365,6 @@ public class Framework {
 	*/
 	public double checkAccuracy(int method, DataSet trainSet, DataSet testSet)
 	{
-		/* if(method == Framework.CONFUSION_MATRIX)
-		{
-			System.out.println("Under construction");
-			return -1.0;
-		} */
-	
 		int correctCount = 0;
 		int wrongCount = 0;
 		String predictedCorrect = "";
@@ -385,13 +379,20 @@ public class Framework {
 				
 			else if(method == Framework.CONFUSION_MATRIX)
 			{
+				int errorType = errorMatrices.findError(wrong, actualCorrect)[0];
+				if(errorType == ErrorMatrices.UNKNOWN_ERROR)	// Not a single error, ignore
+					continue;
+					
 				predictedCorrect = spellCheckConfusionMatrices(wrong, testSet);
 			}
 			
 			if(predictedCorrect.equals(actualCorrect))
 				correctCount++;
 			else
+			{
+				System.out.println("\nPrediction went wrong:\nWrong word: " + wrong + "\nPredicted correct: " + predictedCorrect + "\nActual correct: " + actualCorrect);
 				wrongCount++;
+			}
 		}
 		
 		double accuracy = (double) (correctCount * 100) / (correctCount + wrongCount);
@@ -475,13 +476,13 @@ public class Framework {
 		//System.out.println("Enter wrong string");
 		//wrong = br.readLine();
 		
-		System.out.println("The accuracy of Edit Distance Approach is: " + obj.checkAccuracy(Framework.EDIT_DISTANCE, null, obj.dataSet));
+		//System.out.println("The accuracy of Edit Distance Approach is: " + obj.checkAccuracy(Framework.EDIT_DISTANCE, null, obj.dataSet));
 		//System.out.println("\nEdit distance: ");
 		//obj.spellCheckEditDistance(wrong);
 		//System.out.println("\nConfusion Matrices Approach: ");
 		//obj.spellCheckConfusionMatrices(wrong, obj.dataSet);
 		
-		//System.out.println("The cross-validated accuracy of Confusion Matrices approach is: " + obj.checkCrossValidateAccuracy(Framework.CONFUSION_MATRIX, obj.dataSet));
+		System.out.println("The cross-validated accuracy of Confusion Matrices approach is: " + obj.checkCrossValidateAccuracy(Framework.CONFUSION_MATRIX, obj.dataSet));
 	}
 
 }
